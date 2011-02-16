@@ -1138,9 +1138,15 @@ else
 $(INTERNAL_OTA_PACKAGE_TARGET): override_device := $(TARGET_OTA_ASSERT_DEVICE)
 endif
 
+ifneq ($(TARGET_PROVIDES_RELEASETOOLS), true)
+    OTA_FROM_TARGET_SCRIPT := ./build/tools/releasetools/ota_from_target_files
+else
+    OTA_FROM_TARGET_SCRIPT := $(TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT)
+endif
+
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	@echo "Package OTA: $@"
-	$(hide) ./build/tools/releasetools/ota_from_target_files -v \
+	$(hide) $(OTA_FROM_TARGET_SCRIPT) -v \
 	   -p $(HOST_OUT) \
            -k $(KEY_CERT_PAIR) \
            --backup=$(backuptool) \
@@ -1178,9 +1184,15 @@ else
 $(INTERNAL_UPDATE_PACKAGE_TARGET): extensions := $(TARGET_RELEASETOOLS_EXTENSIONS)
 endif
 
+ifneq ($(TARGET_PROVIDES_RELEASETOOLS), true)
+    IMG_FROM_TARGET_SCRIPT := ./build/tools/releasetools/img_from_target_files
+else
+    IMG_FROM_TARGET_SCRIPT := $(TARGET_RELEASETOOL_IMG_FROM_TARGET_SCRIPT)
+endif
+
 $(INTERNAL_UPDATE_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	@echo "Package: $@"
-	$(hide) ./build/tools/releasetools/img_from_target_files -v \
+	$(hide) $(IMG_FROM_TARGET_SCRIPT) -v \
 	   -s $(extensions) \
 	   -p $(HOST_OUT) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
